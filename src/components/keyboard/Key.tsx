@@ -1,6 +1,7 @@
 import { ReactNode } from 'react'
 import classnames from 'classnames'
 import { KeyValue } from '../../lib/keyboard'
+import React from "react";
 import { CharStatus } from '../../lib/statuses'
 
 type Props = {

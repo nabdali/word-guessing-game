@@ -1,4 +1,4 @@
-import { solution } from './words'
+import {loadGameStateFromLocalStorage} from "./localStorage";
 
 export type CharStatus = 'absent' | 'present' | 'correct'
 
@@ -33,6 +33,8 @@ export type CharValue =
 export const getStatuses = (
   guesses: string[]
 ): { [key: string]: CharStatus } => {
+  const loaded = loadGameStateFromLocalStorage()
+  const solution = loaded?.solution || ""
   const charObj: { [key: string]: CharStatus } = {}
 
   guesses.forEach((word) => {
@@ -58,6 +60,8 @@ export const getStatuses = (
 }
 
 export const getGuessStatuses = (guess: string): CharStatus[] => {
+  const loaded = loadGameStateFromLocalStorage()
+  const solution = loaded?.solution || ""
   const splitSolution = solution.split('')
   const splitGuess = guess.split('')
 

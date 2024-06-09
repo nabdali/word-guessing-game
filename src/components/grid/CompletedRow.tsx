@@ -1,3 +1,4 @@
+import React from "react";
 import { getGuessStatuses } from '../../lib/statuses'
 import { Cell } from './Cell'
 

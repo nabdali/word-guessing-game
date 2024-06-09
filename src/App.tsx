@@ -1,7 +1,8 @@
+import React from 'react'
 import {
-  InformationCircleIcon,
-  ChartBarIcon,
+  QuestionMarkCircleIcon,
   SunIcon,
+  TrendingUpIcon,
 } from '@heroicons/react/outline'
 import { useState, useEffect } from 'react'
 import { Alert } from './components/alerts/Alert'
@@ -19,14 +20,17 @@ import {
   WORD_NOT_FOUND_MESSAGE,
   CORRECT_WORD_MESSAGE,
 } from './constants/strings'
-import { isWordInWordList, isWinningWord, solution } from './lib/words'
+import { getWordOfDay } from './lib/words'
 import { addStatsForCompletedGame, loadStats } from './lib/stats'
 import {
   loadGameStateFromLocalStorage,
   saveGameStateToLocalStorage,
 } from './lib/localStorage'
+import confetti from 'canvas-confetti'
 
 import './App.css'
+import { WORDS } from './constants/wordlist'
+import { VALIDGUESSES } from './constants/validGuesses'
 
 const ALERT_TIME_MS = 2000
 
@@ -50,6 +54,15 @@ function App() {
       ? true
       : false
   )
+  const [solution, setSolution] = useState<string>(() => {
+    const loadedGame = loadGameStateFromLocalStorage()
+    if (loadedGame?.solution === undefined) {
+      const { solution: newSolution } = getWordOfDay()
+      saveGameStateToLocalStorage({ guesses: [], solution: newSolution })
+      return newSolution
+    }
+    return loadedGame.solution
+  })
   const [successAlert, setSuccessAlert] = useState('')
   const [guesses, setGuesses] = useState<string[]>(() => {
     const loaded = loadGameStateFromLocalStorage()
@@ -82,14 +95,20 @@ function App() {
   }
 
   useEffect(() => {
-    saveGameStateToLocalStorage({ guesses, solution })
-  }, [guesses])
+    if (!isGameWon || !isGameLost) {
+      saveGameStateToLocalStorage({ guesses, solution })
+    }
+  }, [isGameLost, isGameWon, guesses])
 
   useEffect(() => {
     if (isGameWon) {
       setSuccessAlert(
         WIN_MESSAGES[Math.floor(Math.random() * WIN_MESSAGES.length)]
       )
+      confetti({
+        particleCount: 300,
+        spread: 60,
+      })
       setTimeout(() => {
         setSuccessAlert('')
         setIsStatsModalOpen(true)
@@ -110,6 +129,13 @@ function App() {
 
   const onDelete = () => {
     setCurrentGuess(currentGuess.slice(0, -1))
+  }
+  const isWinningWord = (word: string) => {
+    return solution === word
+  }
+
+  const isWordInWordList = (word: string) => {
+    return WORDS.includes(word) || VALIDGUESSES.includes(word)
   }
 
   const onEnter = () => {
@@ -152,17 +178,25 @@ function App() {
     <div className="py-8 max-w-7xl mx-auto sm:px-6 lg:px-8">
       <div className="flex w-80 mx-auto items-center mb-8 mt-12">
         <h1 className="text-xl ml-2.5 grow font-bold dark:text-white">
-          {GAME_TITLE}
+          {GAME_TITLE.split('').map((lettre, key) => (
+            <div
+              key={key}
+              className={`lettre-${key}`}
+              style={{ display: 'table-cell' }}
+            >
+              {lettre}
+            </div>
+          ))}
         </h1>
         <SunIcon
           className="h-6 w-6 mr-2 cursor-pointer dark:stroke-white"
           onClick={() => handleDarkMode(!isDarkMode)}
         />
-        <InformationCircleIcon
+        <QuestionMarkCircleIcon
           className="h-6 w-6 mr-2 cursor-pointer dark:stroke-white"
           onClick={() => setIsInfoModalOpen(true)}
         />
-        <ChartBarIcon
+        <TrendingUpIcon
           className="h-6 w-6 mr-3 cursor-pointer dark:stroke-white"
           onClick={() => setIsStatsModalOpen(true)}
         />
@@ -182,6 +216,16 @@ function App() {
       <StatsModal
         isOpen={isStatsModalOpen}
         handleClose={() => setIsStatsModalOpen(false)}
+        handleResetGame={() => {
+          setCurrentGuess('')
+          setIsGameLost(false)
+          setIsGameWon(false)
+          setGuesses([])
+          const { solution: newSolution } = getWordOfDay()
+          console.log(newSolution)
+          setSolution(newSolution)
+          saveGameStateToLocalStorage({ guesses, solution: newSolution })
+        }}
         guesses={guesses}
         gameStats={stats}
         isGameLost={isGameLost}

@@ -1,3 +1,11 @@
 html.dark {
   background-color: rgb(15, 23, 42);
 }
+
+.lettre-0 {
+  color: green;
+}
+
+.lettre-2 {
+  color: orange;
+}

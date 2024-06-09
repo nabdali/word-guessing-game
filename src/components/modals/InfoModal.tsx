@@ -1,3 +1,4 @@
+import React from "react";
 import { Cell } from '../grid/Cell'
 import { BaseModal } from './BaseModal'
 
@@ -8,7 +9,7 @@ type Props = {
 
 export const InfoModal = ({ isOpen, handleClose }: Props) => {
   return (
-    <BaseModal title="How to play" isOpen={isOpen} handleClose={handleClose}>
+    <BaseModal title="Comment jouer ?" isOpen={isOpen} handleClose={handleClose}>
       <p className="text-sm text-gray-500 dark:text-gray-300">
         Trouver le mot en 6 essais. Après chaque supposition, la couleur des carreaux
         changera pour montrer à quel point votre supposition était proche du mot.

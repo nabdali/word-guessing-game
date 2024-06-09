@@ -1,3 +1,4 @@
+import React from "react";
 import { CharStatus } from '../../lib/statuses'
 import classnames from 'classnames'
 

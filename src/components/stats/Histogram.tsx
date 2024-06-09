@@ -1,3 +1,4 @@
+import React from "react";
 import { GameStats } from '../../lib/localStorage'
 import { Progress } from './Progress'
 
